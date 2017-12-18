@@ -32,7 +32,7 @@ The way something as deterministic as a chemical reaction can have an impact ove
 # Exploring the Data Set
 Before starting with a deeper data visualization, lets explore the data we have available through some summaries of the data and create univariate plots to understand the structure of the individual variables in your dataset.
 
-```{r}
+```{r echo=FALSE}
 #
 # explore the data structure of the data set
 #
@@ -66,7 +66,7 @@ The main feature of the dataset is the quality of the wine. The main goal will b
 
 Here's the breakdown of the data for each variable, lets dive deep onto each one:
 
-```{r}
+```{r echo=FALSE}
 #
 # overview of the data values in each variable
 #
@@ -97,7 +97,7 @@ ggplot(aes(x = fixed.acidity), data = na.omit(wine)) +
   xlab('Concentration of tartaric acid - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable fixed.acidity
 #
@@ -124,7 +124,7 @@ ggplot(aes(x = volatile.acidity), data = na.omit(wine)) +
   xlab('Concentration of acetic acid - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable volatile.acidity
 #
@@ -147,7 +147,7 @@ ggplot(aes(x = citric.acid), data = na.omit(wine)) +
   xlab('Concentration of citric acid - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable citric.acid
 #
@@ -159,7 +159,7 @@ The data confirms the research, regarding the concentration found in the wine in
 ### Total acidity
 Since all the acid measurements are expressed in the same unit (g/L), we can easily create a new variable that tracks the total acidity of each wine, adding up the three types of acid.
 
-```{r}
+```{r echo=FALSE}
 #
 # create a new variable wine$total.acid
 #
@@ -193,7 +193,7 @@ ggplot(aes(x = residual.sugar), data = na.omit(wine)) +
   xlab('Concentration of sugar - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable residual.sugar
 #
@@ -217,7 +217,7 @@ ggplot(aes(x = chlorides), data = na.omit(wine)) +
   xlab('Concentration of chlorides - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$chlorides
 #
@@ -242,7 +242,7 @@ ggplot(aes(x = free.sulfur.dioxide), data = na.omit(wine)) +
   xlab('Concentration of free SO2 - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$free.sulfur.dioxide
 #
@@ -261,7 +261,7 @@ ggplot(aes(x = total.sulfur.dioxide), data = na.omit(wine)) +
   xlab('Concentration of total SO2 - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$total.sulfur.dioxide
 #
@@ -270,13 +270,14 @@ summary(wine$total.sulfur.dioxide)
 
 As the histogram shows, wines get their largest dose of sulfites from non-free compounds. To get a better view of the distribution of sulfurs (total vs. free), the next scatterplot shows each data point positioned according to their amount of total vs. free sulfurs.
 
-```{r}
+```{r echo=FALSE}
 ggplot(aes(x = free.sulfur.dioxide, y = total.sulfur.dioxide), data = wine) +
   coord_cartesian(xlim = c(0,80),
                   ylim = c(0, 300)) +
-  geom_point(alpha = 1,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
-             color = I('#099DD9'))
+             color = I('#099DD9')) +
+  geom_smooth(method = "lm", se = FALSE, size = 1)
 ```
 
 The plot confirms that a higher amount of free SO2 usually goes along with a higher amount of total SO2. We can also observe a couple of outliers at the very edge of the graph that we'll analyze later.
@@ -294,7 +295,7 @@ ggplot(aes(x = density), data = na.omit(wine)) +
   xlab('Density - g / L')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$density
 #
@@ -318,11 +319,11 @@ ggplot(aes(x = alcohol), data = na.omit(wine)) +
 
 Most of the values range between 9% and 11%, but let's see how this correlates with density seen above.
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(aes(x = alcohol, y = density), data = wine) +
   coord_cartesian(xlim = c(8, 15),
                   ylim = c(0.99, 1.004)) +
-  geom_point(alpha = 1,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
              color = I('#099DD9'))
 ```
@@ -342,7 +343,7 @@ ggplot(aes(x = pH), data = na.omit(wine)) +
   xlab('pH')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$pH
 #
@@ -364,7 +365,7 @@ ggplot(aes(x = quality), data = na.omit(wine)) +
   xlab('Quality')
 ```
 
-```{r}
+```{r echo=FALSE}
 #
 # value distribution for the variable wine$quality
 #
@@ -387,12 +388,14 @@ Here's the wine distribution by quality:
 ## Visualizing The Whole Data Set
 To start with the bivariate plot section, we'll start by mapping out all the data in a matrix to see if any patterns emerge.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, ggpairs}
+```{r fig.width=10, fig.height=7, echo=FALSE, message=FALSE, warning=FALSE, ggpairs}
 ggpairs(wine,
         columns = 2:13,
         lower = list(
           continuous = wrap("points", alpha = 0.05)),
-        title = "Wines")
+        upper = list(continuous = wrap("cor", size = 3)),
+        title = "Wines") +
+theme(axis.text = element_blank())
 ```
 
 * At first sight there are no extremely strong (>0.7) correlations between the data variables, with the notable exceptions of:
@@ -414,7 +417,7 @@ wine$quality.cat <- as.factor(wine$quality)
 
 The following plot replicates the idea of a matrix for all the data, but segmenting for each quality rating.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, ggpairs_cat}
+```{r fig.width=10, fig.height=7, echo=FALSE, message=FALSE, warning=FALSE, ggpairs_cat}
 ggpairs(
    wine,
    columns = 2:ncol(wine),
@@ -422,8 +425,9 @@ ggpairs(
     continuous = wrap("points", alpha = 0.05),
     mapping = aes(color = quality.cat)),
    diag = "blank",
-   title = "Wines"
- )
+   upper = list(continuous = wrap("cor", size = 3)),
+   title = "Wines") +
+theme(axis.text = element_blank())
 ```
 
 * Box plots are showing up in the upper right section with the new factor variable, when comparing continuous data vs. discrete quality.
@@ -436,20 +440,53 @@ Compare the effect different types of acid have to the overall quality of the wi
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 p1 <- ggplot(aes(x = quality.cat, y = fixed.acidity),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p2 <- ggplot(aes(x = quality.cat, y = volatile.acidity),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p3 <- ggplot(aes(x = quality.cat, y = citric.acid),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 grid.arrange(p1, p2, p3, ncol = 1)
+```
+
+The same data can also be diplayed through a set of histograms.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p1b <- ggplot(aes(x = fixed.acidity), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$fixed.acidity),
+                                max(wine$fixed.acidity)),
+                     breaks = seq(4, 16, 1)) +
+  xlab('Concentration of tartaric acid - g / L')
+
+p2b <- ggplot(aes(x = volatile.acidity), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$volatile.acidity),
+                                max(wine$volatile.acidity)),
+                     breaks = seq(0, 1.8, 0.1)) +
+  xlab('Concentration of volatile acid - g / L')
+
+p3b <- ggplot(aes(x = citric.acid), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$citric.acid),
+                                max(wine$citric.acid)),
+                     breaks = seq(0, 1, 0.1)) +
+  xlab('Concentration of citric acid - g / L')
+
+grid.arrange(p1b, p2b, p3b, ncol = 1)
 ```
 
 * There is no clear evidence that Fixed Acidity contibutes to the overall quality of the wine.
@@ -463,15 +500,39 @@ Compare the effect sugar and chlorides have to the overall quality of the wine.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 p4 <- ggplot(aes(x = quality.cat, y = residual.sugar),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p5 <- ggplot(aes(x = quality.cat, y = chlorides),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 grid.arrange(p4, p5, ncol = 1)
+```
+
+The same data can also be diplayed through a set of histograms.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, histogram_salt_v2}
+p4b <- ggplot(aes(x = residual.sugar), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$residual.sugar),
+                                max(wine$residual.sugar)),
+                     breaks = seq(0, 16, 1)) +
+  xlab('Concentration of sugar - g / L')
+
+p5b <- ggplot(aes(x = chlorides), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$chlorides),
+                                max(wine$chlorides)),
+                     breaks = seq(0, 1, 0.1)) +
+  xlab('Concentration of chlorides - g / L')
+
+grid.arrange(p4b, p5b, ncol = 1)
 ```
 
 * As seen in the histogram for Residual Sugar, most wines stand around 3 g/L, but there's no evidence that supports sugar plays a key factor when it comes to assess the wine quality.
@@ -481,7 +542,7 @@ grid.arrange(p4, p5, ncol = 1)
 ## Sulfurs vs. Quality
 Compare the effect sulfurs (both free and total) have to the overall quality of the wine.
 
-```{r}
+```{r echo=FALSE}
 #
 # Convert sulphates to match sulfurs units (mg/L)
 #
@@ -491,26 +552,78 @@ wine$sulphates <- wine$sulphates * 1000
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 p6 <- ggplot(aes(x = quality.cat, y = free.sulfur.dioxide),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p7 <- ggplot(aes(x = quality.cat, y = total.sulfur.dioxide),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p8 <- ggplot(aes(x = quality.cat, y = sulphates),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 grid.arrange(p6, p7, p8, ncol = 1)
 ```
 
-At first sight it is difficult to draw any conclusions regarding sulphates and wine quality.
+At first sight it is difficult to draw any conclusions regarding sulphates and wine quality. Let's display the same data through a set of histograms.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p6b <- ggplot(aes(x = free.sulfur.dioxide), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$free.sulfur.dioxide),
+                                max(wine$free.sulfur.dioxide)),
+                     breaks = seq(0, 80, 10)) +
+  xlab('Concentration of free SO2 - g / L')
+
+p7b <- ggplot(aes(x = total.sulfur.dioxide), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$total.sulfur.dioxide),
+                                max(wine$total.sulfur.dioxide)),
+                     breaks = seq(0, 300, 50)) +
+  xlab('Concentration of total SO2 - g / L')
+
+p8b <- ggplot(aes(x = sulphates), data = na.omit(wine)) +
+  geom_histogram(bins = 50, aes(fill = quality.cat)) +
+  scale_fill_brewer(type = 'div') +
+  scale_x_continuous(limits = c(min(wine$sulphates),
+                                max(wine$sulphates)),
+                     breaks = seq(0.3, 0.7, 0.1)) +
+  xlab('Concentration of sulphates - g / L')
+
+grid.arrange(p6b, p7b, p8b, ncol = 1)
+```
 
 * While it is true that highly rated wines share small quantities of sulfur, the same it is true for the worst rated wines.
 * On average higher levels of sulphates seem to relate to higher quality wines, but the data is full of outliers with extremely high samples that are not high quality at all.
+
+
+## Chlorides & Sulfurs vs. Quality
+From the previous two sections, it is clear that both cholrides and sulfurs have a direct influence in the wine quality. Let's put those together.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(aes(x = chlorides, y = sulphates), data = wine) +
+  geom_point(alpha = 0.5,
+             position = position_jitter(h = 0),
+             aes(color = quality.cat)) +
+  geom_smooth(method = "lm", se = FALSE, size = 1) +
+  scale_color_brewer(type = 'qual') +
+  labs(x = "Concentration of chlorides (g/L)",
+       y = "Concentration of sulphates (mg/L)")
+```
+
+Indeed this is one of the most interesting plots we've seen so far.
+
+Highest rated wines contain higher concentrations of sulphates. It is interesting though, this is an added component to preserve wine freshness, but supposedly is not perceptible by a human (up to a certain threshold).
+
+Also the concentration of chlorides remains low across the whole high range of quality wines.
 
 
 ## Density & Alcohol vs. Quality
@@ -519,11 +632,13 @@ Compare the effect density and alcohol have to the overall quality of the wine.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 p9 <- ggplot(aes(x = quality.cat, y = alcohol),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
 p10 <- ggplot(aes(x = quality.cat, y = density),
              data = na.omit(wine)) +
+  geom_jitter(alpha = 0.3)  +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = 'point', shape = 4)
 
@@ -543,15 +658,17 @@ Despite related, there is a subtle distinction between pH and acidity. pH refers
 ggplot(aes(x = pH, y = total.acid), data = wine) +
   coord_cartesian(xlim = c(2.5,4),
                   ylim = c(5, 20)) +
-  geom_point(alpha = 1,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
-             aes(color = quality.cat))
+             aes(color = quality.cat)) +
+  geom_smooth(method = "lm", se = FALSE, size = 1) +
+  scale_color_brewer(type='seq',
+                     guide=guide_legend(title='Quality'))
 ```
 
 * As predicted, pH negatively correlates with the total acidity. Therefore we can conclude that the amount of acidity affects the pH (remember lower values of pH signal stronger acids).
 
 
-# Diving Deeper Into Continuous Data
 ## Histograms Evolved
 All the variables presented in the data set are continuous in their own nature. One of the best ways to visualize distributions across a continuous set is using a histogram, like the ones in the first section.
 
@@ -588,8 +705,8 @@ Back to the matrix of plots seen in the Bivariate section, there are still unexp
 ```{r echo=FALSE, message=FALSE, warning=FALSE, ggduo}
 ggduo(
    wine,
-   columnsX = c("chlorides", "citric.acid", "sulphates"),
-   columnsY = c("alcohol"),
+   columnsX = c("alcohol"),
+   columnsY = c("chlorides", "citric.acid", "sulphates"),
    mapping = ggplot2::aes(color = quality.cat),
    title = "Wines",
    types = list(
@@ -716,9 +833,12 @@ Yet another strong correlation that remains unexplored (0.676). So far we alread
 ggplot(aes(x = total.acid, y = density), data = wine) +
   coord_cartesian(xlim = c(5,18),
                   ylim = c(0.990, 1.005)) +
-  geom_point(alpha = 1,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
-             aes(color = quality.bucket))
+             aes(color = quality.bucket)) +
+  geom_smooth(method = "lm", se = FALSE, size = 1) +
+  scale_color_brewer(type='seq',
+                     guide=guide_legend(title='Quality'))
 ```
 
 Acidity shows a clear correlation with density, but unfortunately, it does not seem to have an impact on wine quality, since the data points look really scattered in the plot.
@@ -736,7 +856,7 @@ bestWines <- subset(wine, quality >= 7)
 
 Let's create the same matrix of plots with `ggpairs`, but this time, only with the Best wines.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, ggpairs_best}
+```{r fig.width=10, fig.height=7, echo=FALSE, message=FALSE, warning=FALSE, ggpairs_best}
 ggpairs(
    bestWines,
    columns = 2:12,
@@ -744,26 +864,58 @@ ggpairs(
     continuous = wrap("points", alpha = 0.2),
     mapping = aes(color = quality.cat)),
    diag = "blank",
-   title = "Wines"
- )
+   upper = list(continuous = wrap("cor", size = 3)),
+   title = "Wines") +
+theme(axis.text = element_blank())
 ```
 
 Besides the usual pairs (acids, sulfurs...) that are obviously always correlated, the relations between the variables are weaker than the whole data set. Lets figure out how they relate to quality, purposely left out in this last visualization.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, ggduo_best}
+```{r echo=FALSE, message=FALSE, warning=FALSE, ggduo_best_acid}
 ggduo(
    bestWines,
    columnsX = c("quality.cat"),
-   columnsY = c("fixed.acidity", "volatile.acidity", "citric.acid",
-                "residual.sugar", "chlorides", "free.sulfur.dioxide",
-                "total.sulfur.dioxide", "sulphates", "density", "pH",
-                "alcohol"),
+   columnsY = c("fixed.acidity", "volatile.acidity", "citric.acid"),
    mapping = ggplot2::aes(color = quality.cat),
-   title = "Wines",
+   title = "The effect of acids in best wines",
    types = list(
      continuous = wrap("smooth_loess", alpha = 0.50, shape = "+")
    ),
    legend = 1,
+   xlab = "Wine Quality",
+   showStrips = FALSE
+ )
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, ggduo_best_sulphates}
+ggduo(
+   bestWines,
+   columnsX = c("quality.cat"),
+   columnsY = c("free.sulfur.dioxide",
+                "total.sulfur.dioxide", "sulphates"),
+   mapping = ggplot2::aes(color = quality.cat),
+   title = "The effect of sulfurs in best wines",
+   types = list(
+     continuous = wrap("smooth_loess", alpha = 0.50, shape = "+")
+   ),
+   legend = 1,
+   xlab = "Wine Quality",
+   showStrips = FALSE
+ )
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, ggduo_best_other}
+ggduo(
+   bestWines,
+   columnsX = c("quality.cat"),
+   columnsY = c("residual.sugar", "chlorides", "pH", "alcohol"),
+   mapping = ggplot2::aes(color = quality.cat),
+   title = "The effect of Sugar, Chlorides, pH and Alcohol in best wines",
+   types = list(
+     continuous = wrap("smooth_loess", alpha = 0.50, shape = "+")
+   ),
+   legend = 1,
+   xlab = "Wine Quality",
    showStrips = FALSE
  )
 ```
@@ -824,12 +976,12 @@ Higher concentrations of alcohol, as seen in previous plots, also contributes to
 ## The Role Volatile Acidity and pH Play In The Best Wines
 ```{r echo=FALSE, Plot_TwoA}
 ggplot(aes(x = pH, y = volatile.acidity), data = wine) +
-  geom_point(alpha = 0.8,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
              aes(color = quality.cat)) +
   scale_x_continuous(breaks = seq(2.7, 4, 0.2)) +
   scale_y_continuous(breaks = seq(0.1, 1.6, 0.2)) +
-  scale_color_brewer(type = 'qual',
+  scale_color_brewer(type = 'seq',
                      labels=c("3 - Worst", "4", "5", "6", "7", "8 - Best"),
                      guide = guide_legend(title = "Wine Rating")) +
   labs(title = "Acetic acid vs. pH of Wine Samples by Quality",
@@ -863,10 +1015,11 @@ ggplot(aes(x = pH, y = volatile.acidity), data = extremeWines) +
              aes(color = quality.cat)) +
   scale_x_continuous(breaks = seq(2.7, 4, 0.2)) +
   scale_y_continuous(breaks = seq(0.1, 1.6, 0.2)) +
-  scale_color_brewer(type = 'qual',
+  scale_color_brewer(type = 'seq',
                      labels=c("3 - Worst", "4", "7", "8 - Best"),
                      guide = guide_legend(title = "Wine Rating")) +
-  labs(title = "Acetic acid vs. pH of Wine Samples by Quality (only Good and Best wines)",
+  labs(title = "Acetic acid vs. pH of Wine Samples by
+       Quality (only Good and Best wines)",
        x = "Level of pH",
        y = "Concentration of acetic acid (g/L)") +
   theme(legend.background = element_rect(fill="white"),
@@ -877,24 +1030,20 @@ This plot dissects the data even further and draws a clearer separation between 
 
 
 ## The Role Chlorides and Sulphates Play In The Best Wines
-For this final plot, I wanted to do something a little bit different.
-
-Despite this plot does not exist, as is, in previous sections, similar versions of this have been outlied. This one only puts it together.
-
-For this plot I went the other way around, I went out and researched about what's the most defining caractheristic of a wine, or at least, which components have an effect on their quality.
+For this final plot, I wanted to do something a little bit different and went the other way around. I went out and researched about what's the most defining caractheristic of a wine, or at least, which components have an effect on their quality.
 
 Quick research on the Internet shows that volatile acid (already studied), sulphates (added to the wine) and chlorides can be deal breaker when it comes to wine quality.
 
 ```{r echo=FALSE, Plot_Three}
 ggplot(aes(x = chlorides, y = sulphates), data = wine) +
-  geom_point(alpha = 0.8,
+  geom_point(alpha = 0.5,
              position = position_jitter(h = 0),
              aes(color = quality.cat)) +
   coord_cartesian(xlim = c(quantile(wine$chlorides, 0.02),
                            quantile(wine$chlorides, 0.95)),
                   ylim = c(quantile(wine$sulphates, 0.02),
                            quantile(wine$sulphates, 0.95))) +
-  scale_color_brewer(type = 'qual',
+  scale_color_brewer(type = 'seq',
                      labels=c("3 - Worst", "4", "5", "6", "7", "8 - Best"),
                      guide = guide_legend(title = "Wine Rating")) +
   labs(title = "Chlorides vs. Sulphates of Wine Samples by Quality",
