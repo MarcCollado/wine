@@ -5,7 +5,6 @@ output:
 ---
 
 # Wine Quality by Marc Collado
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, load_packages}
 library(ggplot2)
 library(ggthemes)
@@ -43,7 +42,6 @@ names(wine[2:13])
 The data set consists of 1599 observations and 12 variables (13 if you count `X`, which is merely a numeration). 11 of them are input variables, measurements from each wine sample. The last one is the output variable, a score between 1 and 10, that measures the wine quality determined by each critic.
 
 **Input variables (based on physicochemical tests):**
-
 1. fixed acidity (tartaric acid - g / dm^3)
 2. volatile acidity (acetic acid - g / dm^3)
 3. citric acid (g / dm^3)
@@ -57,7 +55,6 @@ The data set consists of 1599 observations and 12 variables (13 if you count `X`
 11. alcohol (% by volume)
 
 **Output variable (based on sensory data):**
-
 12. quality (score between 0 and 10)
 
 The main feature of the dataset is the quality of the wine. The main goal will be to relate which quantitative features (1 to 11) end up influencing the quality of the wine.
@@ -72,7 +69,6 @@ Here's the breakdown of the data for each variable, lets dive deep onto each one
 #
 summary(wine[2:13])
 ```
-
 
 ## Acids
 Acids are major wine constituents and contribute greatly to its taste.  In fact, acids impart the sourness or tartness that is a fundamental feature in wine taste.
