@@ -1,6 +1,13 @@
 # Wine
 Data Analysis Project — Udacity Data Analyst Nanodegree
 
+This project is part of the Data Analyst Nanodegree. Below you'll find the rest of the projects and I also wrote a [short post](https://collado.io/blog/2018/udacity-dand) about the experience.
+
+* [Exploratory data analysis](https://github.com/MarcCollado/wine)
+* [Data wrangling](https://github.com/MarcCollado/open-street-map)
+* [Machine learning](https://github.com/MarcCollado/enron)
+* [Data visualization](https://public.tableau.com/profile/marccollado#!/vizhome/TitanicFinal_6/Titanic)
+
 ## Summary
 This project reveals the link between the components (input variables) of wine samples and its final taste, evaluated by experts. In other words, it will help uncover the hidden recipe for the perfect wine making.
 
